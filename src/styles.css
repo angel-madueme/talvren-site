@@ -499,15 +499,18 @@ ol {
   transition: transform 0.45s cubic-bezier(0.33, 1, 0.35, 1), color 0.28s ease;
 }
 
-.btn:hover::before,
-.btn:focus-visible::before {
-  transform: translateY(0);
-}
+/* Hover fill only on devices with a real hover pointer — prevents the fill
+   from latching on touch (tap) and after mouse-click focus. Keyboard focus
+   is still indicated by the global :focus-visible outline ring. */
+@media (hover: hover) {
+  .btn:hover::before {
+    transform: translateY(0);
+  }
 
-.btn:hover .btn-label,
-.btn:focus-visible .btn-label {
-  transform: translateX(4px);
-  color: var(--btn-hover-text);
+  .btn:hover .btn-label {
+    transform: translateX(4px);
+    color: var(--btn-hover-text);
+  }
 }
 
 .btn:active {
@@ -1179,8 +1182,7 @@ ol {
     transition: none;
   }
 
-  .btn:hover .btn-label,
-  .btn:focus-visible .btn-label {
+  .btn:hover .btn-label {
     transform: none;
   }
 

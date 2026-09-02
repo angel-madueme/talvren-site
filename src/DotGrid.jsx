@@ -104,14 +104,15 @@ const DotGrid = ({
     const pr = pointerRef.current;
     let lastRipple = 0;
 
-    // Strong-ish push so the ripples read clearly.
-    const PUSH_SCALE = 0.85;
+    // Moderate push so dots glide rather than snap.
+    const PUSH_SCALE = 0.72;
 
-    // Two virtual pointers wander the grid on fast, out-of-phase paths so the
-    // glow-and-ripple effect stays lively across the whole surface on its own.
+    // Two virtual pointers wander the grid, each on a blend of two low
+    // frequencies per axis — fluid, continuous, non-repeating motion (no fast
+    // jitter) so the effect stays lively but smooth.
     const paths = [
-      { fx: 0.5, fy: 0.42, ph: 0.0, prev: null },
-      { fx: 0.63, fy: 0.34, ph: 2.6, prev: null }
+      { fx: 0.5, gx: 0.31, fy: 0.42, gy: 0.27, ph: 0.0, prev: null },
+      { fx: 0.44, gx: 0.29, fy: 0.55, gy: 0.35, ph: 2.6, prev: null }
     ];
 
     const applyInertia = (x, y, vx, vy, speed) => {
@@ -129,7 +130,7 @@ const DotGrid = ({
                 xOffset: 0,
                 yOffset: 0,
                 duration: returnDuration,
-                ease: 'elastic.out(1,0.75)'
+                ease: 'elastic.out(1,0.85)'
               });
               dot._inertiaApplied = false;
             }
@@ -150,13 +151,13 @@ const DotGrid = ({
       const h = rect.height || 1;
       const t = (now - t0) * 0.001;
 
-      // positions of both pointers (main sweep + a faster jitter harmonic)
+      // positions of both pointers — two blended low-freq sines per axis
       const pts = paths.map(p => ({
-        x: w * (0.5 + 0.4 * Math.sin(t * p.fx + p.ph) + 0.1 * Math.sin(t * 0.95 + p.ph)),
-        y: h * (0.5 + 0.4 * Math.sin(t * p.fy + p.ph + 1.7) + 0.1 * Math.cos(t * 0.8 + p.ph))
+        x: w * (0.5 + 0.32 * Math.sin(t * p.fx + p.ph) + 0.14 * Math.sin(t * p.gx + p.ph + 1.1)),
+        y: h * (0.5 + 0.32 * Math.sin(t * p.fy + p.ph + 1.7) + 0.14 * Math.cos(t * p.gy + p.ph))
       }));
 
-      const doRipple = now - lastRipple > 32;
+      const doRipple = now - lastRipple > 36;
       pts.forEach((pt, i) => {
         const p = paths[i];
         if (p.prev && doRipple) {

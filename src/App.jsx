@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import GradientWaves from "./GradientWaves.jsx";
+import StarSwipe from "./StarSwipe.jsx";
 import DotGrid from "./DotGrid.jsx";
 import UserCursor from "./UserCursor.jsx";
 import { prefersReducedMotion, useReveal, useScrollFill } from "./hooks.js";
@@ -86,34 +86,20 @@ function Nav() {
   );
 }
 
-/* 1. HERO — GradientWaves shader background (palette-mapped), text above */
+/* 1. HERO — StarSwipe conformal star-warp background (dark), text above */
 function Hero() {
   const [reduce] = useState(() => prefersReducedMotion());
   return (
-    <section className="hero" id="top">
+    <section className="hero hero-dark" id="top">
       {!reduce && (
         <div className="hero-waves" aria-hidden="true">
-          <GradientWaves
-            horizonColor="#9E7FD8"
-            waveColor="#7DB0FF"
-            crestColor="#FFD3AE"
-            speed={0.4}
-            amplitude={3.0}
-            waveScale={1.0}
-            waveRatio={0.9}
-            swell={35}
-            turbulence={20}
-            tilt={0.62}
-            zoom={1.0}
-            height={3.5}
-            fogDepth={13}
-            detail="medium"
-            brightness={1.08}
-            opacity={1.0}
-            mouseInteraction={true}
-            parallaxStrength={0.5}
-            grain={true}
-            grainIntensity={0.05}
+          <StarSwipe
+            colorA="#98C1FF"
+            colorB="#BE9DFF"
+            speed={0.12}
+            sweep={0.06}
+            density={1.0}
+            brightness={1.05}
           />
         </div>
       )}
@@ -133,7 +119,7 @@ function Hero() {
           efficiently.
         </p>
         <div className="hero-in hero-in-3">
-          <a href="#contact" className="btn btn-primary btn-lg">
+          <a href="#contact" className="btn btn-light btn-lg">
             <span className="btn-label">Start a project</span>
           </a>
         </div>

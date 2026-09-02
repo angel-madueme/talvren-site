@@ -577,26 +577,29 @@ ol {
   padding: 150px 0 110px;
 }
 
-/* GradientWaves shader background, clipped to the hero */
+/* Dark base so the star field reads (and shows under reduced motion) */
+.hero-dark {
+  background: radial-gradient(120% 120% at 50% 30%, #1b1440 0%, #0f0b26 60%, #0a0819 100%);
+}
+
+/* StarSwipe shader background, clipped to the hero */
 .hero-waves {
   position: absolute;
   inset: 0;
   z-index: 0;
 }
 
-/* Soft off-white scrim keeps the dark hero type legible over the waves */
+/* Subtle dark vignette behind the text keeps the light type legible */
 .hero-scrim {
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: linear-gradient(
-    to bottom,
-    rgba(244, 244, 244, 0.64) 0%,
-    rgba(244, 244, 244, 0.48) 34%,
-    rgba(244, 244, 244, 0.18) 56%,
-    rgba(244, 244, 244, 0) 78%,
-    rgba(244, 244, 244, 0) 100%
+  background: radial-gradient(
+    115% 80% at 50% 44%,
+    rgba(10, 8, 26, 0.72) 0%,
+    rgba(10, 8, 26, 0.45) 42%,
+    rgba(10, 8, 26, 0) 78%
   );
 }
 
@@ -607,13 +610,17 @@ ol {
   max-width: 900px;
 }
 
+.hero-dark .hero-title {
+  color: var(--canvas);
+}
+
 .hero-copy {
   max-width: 560px;
   margin: 20px auto 36px;
   font-size: 20px;
   line-height: 1.55;
   letter-spacing: -0.01em;
-  color: var(--ink);
+  color: rgba(244, 244, 244, 0.82);
 }
 
 /* ---------- Cards ---------- */

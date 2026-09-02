@@ -1,0 +1,12 @@
+.star-swipe {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.star-swipe canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

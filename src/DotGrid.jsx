@@ -102,16 +102,18 @@ const DotGrid = ({
     const proxSq = proximity * proximity;
     const t0 = performance.now();
     const pr = pointerRef.current;
-    let lastX = null;
-    let lastY = null;
-    let lastT = t0;
     let lastRipple = 0;
 
-    // Softer displacement than a raw cursor push, for a subtle ambient feel.
-    const PUSH_SCALE = 0.5;
+    // Strong-ish push so the ripples read clearly.
+    const PUSH_SCALE = 0.85;
 
-    // Ripple the dots the virtual pointer sweeps past (same inertia + elastic
-    // return the hover used, just driven autonomously).
+    // Two virtual pointers wander the grid on fast, out-of-phase paths so the
+    // glow-and-ripple effect stays lively across the whole surface on its own.
+    const paths = [
+      { fx: 0.5, fy: 0.42, ph: 0.0, prev: null },
+      { fx: 0.63, fy: 0.34, ph: 2.6, prev: null }
+    ];
+
     const applyInertia = (x, y, vx, vy, speed) => {
       for (const dot of dotsRef.current) {
         const dist = Math.hypot(dot.cx - x, dot.cy - y);
@@ -143,27 +145,32 @@ const DotGrid = ({
         return;
       }
 
-      // Wander a virtual pointer across the grid on a looping path
-      // (two out-of-phase sines per axis so it never repeats obviously).
       const rect = canvas.getBoundingClientRect();
       const w = rect.width || 1;
       const h = rect.height || 1;
       const t = (now - t0) * 0.001;
-      const px = w * (0.5 + 0.4 * Math.sin(t * 0.3) + 0.08 * Math.sin(t * 0.13 + 1.3));
-      const py = h * (0.5 + 0.4 * Math.sin(t * 0.24 + 2.1) + 0.08 * Math.cos(t * 0.19));
 
-      if (lastX !== null && now - lastRipple > 55) {
-        const dt = Math.max(1, now - lastT);
-        const vx = ((px - lastX) / dt) * 1000;
-        const vy = ((py - lastY) / dt) * 1000;
-        applyInertia(px, py, vx, vy, Math.hypot(vx, vy));
-        lastRipple = now;
-      }
-      pr.x = px;
-      pr.y = py;
-      lastX = px;
-      lastY = py;
-      lastT = now;
+      // positions of both pointers (main sweep + a faster jitter harmonic)
+      const pts = paths.map(p => ({
+        x: w * (0.5 + 0.4 * Math.sin(t * p.fx + p.ph) + 0.1 * Math.sin(t * 0.95 + p.ph)),
+        y: h * (0.5 + 0.4 * Math.sin(t * p.fy + p.ph + 1.7) + 0.1 * Math.cos(t * 0.8 + p.ph))
+      }));
+
+      const doRipple = now - lastRipple > 32;
+      pts.forEach((pt, i) => {
+        const p = paths[i];
+        if (p.prev && doRipple) {
+          const dt = Math.max(1, now - p.prev.t);
+          const vx = ((pt.x - p.prev.x) / dt) * 1000;
+          const vy = ((pt.y - p.prev.y) / dt) * 1000;
+          applyInertia(pt.x, pt.y, vx, vy, Math.hypot(vx, vy));
+        }
+        p.prev = { x: pt.x, y: pt.y, t: now };
+      });
+      if (doRipple) lastRipple = now;
+
+      pr.x = pts[0].x;
+      pr.y = pts[0].y;
 
       const ctx = canvas.getContext('2d');
       if (!ctx) {
@@ -175,14 +182,19 @@ const DotGrid = ({
       for (const dot of dotsRef.current) {
         const ox = dot.cx + dot.xOffset;
         const oy = dot.cy + dot.yOffset;
-        const dx = dot.cx - px;
-        const dy = dot.cy - py;
-        const dsq = dx * dx + dy * dy;
+
+        // nearest of the two pointers drives the glow
+        let dmin = Infinity;
+        for (const pt of pts) {
+          const dx = dot.cx - pt.x;
+          const dy = dot.cy - pt.y;
+          const dsq = dx * dx + dy * dy;
+          if (dsq < dmin) dmin = dsq;
+        }
 
         let style = baseColor;
-        if (dsq <= proxSq) {
-          const dist = Math.sqrt(dsq);
-          const ti = 1 - dist / proximity;
+        if (dmin <= proxSq) {
+          const ti = 1 - Math.sqrt(dmin) / proximity;
           const r = Math.round(baseRgb.r + (activeRgb.r - baseRgb.r) * ti);
           const g = Math.round(baseRgb.g + (activeRgb.g - baseRgb.g) * ti);
           const b = Math.round(baseRgb.b + (activeRgb.b - baseRgb.b) * ti);

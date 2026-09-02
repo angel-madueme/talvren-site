@@ -86,21 +86,14 @@ function Nav() {
   );
 }
 
-/* 1. HERO — StarSwipe conformal star-warp background (dark), text above */
+/* 1. HERO — StarSwipe flowing warped bands (blue/purple on light), text above */
 function Hero() {
   const [reduce] = useState(() => prefersReducedMotion());
   return (
-    <section className="hero hero-dark" id="top">
+    <section className="hero" id="top">
       {!reduce && (
         <div className="hero-waves" aria-hidden="true">
-          <StarSwipe
-            colorA="#98C1FF"
-            colorB="#BE9DFF"
-            speed={0.12}
-            sweep={0.06}
-            density={1.0}
-            brightness={1.05}
-          />
+          <StarSwipe colorA="#98C1FF" colorB="#BE9DFF" background="#F4F4F4" />
         </div>
       )}
       <div className="hero-scrim" aria-hidden="true" />
@@ -119,7 +112,7 @@ function Hero() {
           efficiently.
         </p>
         <div className="hero-in hero-in-3">
-          <a href="#contact" className="btn btn-light btn-lg">
+          <a href="#contact" className="btn btn-primary btn-lg">
             <span className="btn-label">Start a project</span>
           </a>
         </div>

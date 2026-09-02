@@ -103,9 +103,35 @@ const DotGrid = ({
     const t0 = performance.now();
     const pr = pointerRef.current;
     let lastRipple = 0;
+    let lastMouseRipple = 0;
 
     // Moderate push so dots glide rather than snap.
     const PUSH_SCALE = 0.72;
+
+    // Real-cursor tracking (interaction on top of the ambient motion).
+    const mouse = { x: 0, y: 0, vx: 0, vy: 0, active: false, lastX: 0, lastY: 0, lastT: 0 };
+    const onMouseMove = (e) => {
+      const cv = canvasRef.current;
+      if (!cv) return;
+      const r = cv.getBoundingClientRect();
+      const x = e.clientX - r.left;
+      const y = e.clientY - r.top;
+      if (x < 0 || y < 0 || x > r.width || y > r.height) {
+        mouse.active = false;
+        return;
+      }
+      const nowm = performance.now();
+      const dt = mouse.lastT ? Math.max(1, nowm - mouse.lastT) : 16;
+      mouse.vx = ((x - mouse.lastX) / dt) * 1000;
+      mouse.vy = ((y - mouse.lastY) / dt) * 1000;
+      mouse.lastX = x;
+      mouse.lastY = y;
+      mouse.lastT = nowm;
+      mouse.x = x;
+      mouse.y = y;
+      mouse.active = true;
+    };
+    window.addEventListener("mousemove", onMouseMove, { passive: true });
 
     // One virtual pointer wanders the grid on a blend of two low frequencies
     // per axis — fluid, continuous, non-repeating motion (no fast jitter) so
@@ -172,6 +198,16 @@ const DotGrid = ({
       pr.x = pts[0].x;
       pr.y = pts[0].y;
 
+      // While the cursor is over the grid, it drives the glow and adds ripples.
+      if (mouse.active && now - mouse.lastT < 1200) {
+        pr.x = mouse.x;
+        pr.y = mouse.y;
+        if (now - lastMouseRipple > 40) {
+          applyInertia(mouse.x, mouse.y, mouse.vx, mouse.vy, Math.hypot(mouse.vx, mouse.vy));
+          lastMouseRipple = now;
+        }
+      }
+
       const ctx = canvas.getContext('2d');
       if (!ctx) {
         rafId = requestAnimationFrame(draw);
@@ -212,7 +248,10 @@ const DotGrid = ({
     };
 
     rafId = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(rafId);
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("mousemove", onMouseMove);
+    };
   }, [proximity, baseColor, activeRgb, baseRgb, circlePath, speedTrigger, resistance, returnDuration]);
 
   useEffect(() => {

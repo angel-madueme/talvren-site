@@ -2,8 +2,8 @@ import { useEffect, useRef } from "react";
 import { Renderer, Program, Mesh, Triangle } from "ogl";
 import "./StarSwipe.css";
 
-// Original conformal (log-polar) star-warp shader with a slow angular sweep,
-// tinted with a blue -> purple blend. Full-screen fragment effect via ogl.
+// Soft flowing warped light-bands (blue -> purple) on a light ground, with a
+// gentle sweep and film grain. Full-screen fragment effect via ogl.
 
 const hexToRgb = (hex) => {
   const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -27,12 +27,16 @@ precision highp float;
 uniform vec2 iResolution;
 uniform float iTime;
 uniform float uSpeed;
-uniform float uSweep;
-uniform float uDensity;
-uniform float uBrightness;
-uniform float uOpacity;
+uniform float uScale;
+uniform float uRotation;
+uniform float uWarpStrength;
+uniform float uWarpCurvature;
+uniform float uWarpFalloff;
+uniform float uNoise;
+uniform float uIntensity;
 uniform vec3 uColorA;
 uniform vec3 uColorB;
+uniform vec3 uBackground;
 out vec4 fragColor;
 
 float hash21(vec2 p) {
@@ -43,56 +47,54 @@ float hash21(vec2 p) {
 
 void main() {
   vec2 uv = (gl_FragCoord.xy - 0.5 * iResolution.xy) / iResolution.y;
-  float r = length(uv) + 1e-3;
-  float a = atan(uv.y, uv.x);
-  float t = iTime;
+  uv /= uScale;
+  float ca = cos(uRotation);
+  float sa = sin(uRotation);
+  uv = mat2(ca, -sa, sa, ca) * uv;
 
-  // Layered star tunnel in conformal log-polar space, streaming + sweeping.
-  vec3 stars = vec3(0.0);
-  const int LAYERS = 5;
-  for (int i = 0; i < LAYERS; i++) {
-    float fi = float(i);
-    float depth = fract(-log(r) * 0.35 + t * uSpeed * (0.5 + 0.12 * fi) + fi * 0.2);
-    float scale = mix(34.0, 7.0, depth) * uDensity;
-    float ang = a + t * uSweep * (0.45 + 0.08 * fi);
-    vec2 cell = vec2(ang / 6.28318 * scale, depth * scale);
-    vec2 id = floor(cell);
-    vec2 f = fract(cell) - 0.5;
-    float h = hash21(id + fi * 23.0);
-    if (h > 0.8) {
-      vec2 sp = (fract(vec2(h * 41.0, h * 97.0)) - 0.5) * 0.6;
-      vec2 df = (f - sp) * vec2(1.0, 0.4); // streak radially
-      float d = length(df);
-      float star = smoothstep(0.09, 0.0, d);
-      float twinkle = 0.65 + 0.35 * sin(t * 3.0 + h * 40.0);
-      float fade = smoothstep(0.0, 0.12, depth) * smoothstep(1.0, 0.72, depth);
-      stars += star * twinkle * fade * (0.25 + 0.75 * depth);
-    }
-  }
+  float t = iTime * uSpeed;
 
-  // Blue -> purple blend that also sweeps around, for a seamless mix.
-  float mixT = clamp(0.5 + 0.5 * sin(a * 1.3 + t * 0.22), 0.0, 1.0);
-  vec3 tint = mix(uColorA, uColorB, mixT);
+  // Domain warp for the flowing, curved look.
+  float warp = 0.0;
+  warp += sin(uv.y * uWarpCurvature * 0.55 + t * 1.2) * 0.5;
+  warp += sin((uv.x + uv.y) * 1.1 - t * 0.8) * 0.35;
+  warp *= uWarpStrength;
+  warp *= 1.0 / (1.0 + uWarpFalloff * 0.04 * dot(uv, uv)); // soften toward edges
 
-  // Deep blended background glow toward the centre.
-  float glow = smoothstep(1.15, 0.0, r);
-  vec3 bg = mix(uColorB * 0.07, uColorA * 0.16, glow);
+  // Overlapping soft bands.
+  float v = 0.0;
+  v += sin(uv.x * 2.1 + warp * 3.0 + t) * 0.5 + 0.5;
+  v += sin(uv.x * 1.3 - uv.y * 0.55 + warp * 2.0 - t * 0.7) * 0.25 + 0.25;
+  v *= 0.6667;
+  v = smoothstep(0.22, 0.95, v);
 
-  vec3 col = bg + stars * tint * 2.3;
-  col *= uBrightness;
+  // Blue <-> purple blend woven through the field.
+  float cm = clamp(0.5 + 0.5 * sin(uv.y * 0.9 + warp + t * 0.4), 0.0, 1.0);
+  vec3 ribbon = mix(uColorA, uColorB, cm);
+
+  vec3 col = mix(uBackground, ribbon, v * uIntensity);
+
+  // Film grain.
+  float g = hash21(gl_FragCoord.xy + mod(iTime, 64.0) * 13.0);
+  col += (g - 0.5) * uNoise * 0.05;
+
   col = clamp(col, 0.0, 1.0);
-  fragColor = vec4(col, uOpacity);
+  fragColor = vec4(col, 1.0);
 }
 `;
 
 export default function StarSwipe({
   colorA = "#98C1FF",
   colorB = "#BE9DFF",
-  speed = 0.12,
-  sweep = 0.06,
-  density = 1.0,
-  brightness = 1.0,
-  opacity = 1.0,
+  background = "#F4F4F4",
+  speed = 0.34,
+  scale = 1.3,
+  rotation = 0.7,
+  warpStrength = 1.2,
+  warpCurvature = 5.6,
+  warpFalloff = 4.0,
+  noise = 0.84,
+  intensity = 0.55,
   className = "",
 }) {
   const mountRef = useRef(null);
@@ -104,12 +106,10 @@ export default function StarSwipe({
     const renderer = new Renderer({
       webgl: 2,
       alpha: true,
-      premultipliedAlpha: true,
       antialias: false,
       dpr: Math.min(window.devicePixelRatio || 1, 2),
     });
     const gl = renderer.gl;
-    gl.clearColor(0, 0, 0, 0);
     const canvas = gl.canvas;
     mount.appendChild(canvas);
 
@@ -121,12 +121,16 @@ export default function StarSwipe({
         iResolution: { value: new Float32Array([1, 1]) },
         iTime: { value: 0 },
         uSpeed: { value: speed },
-        uSweep: { value: sweep },
-        uDensity: { value: density },
-        uBrightness: { value: brightness },
-        uOpacity: { value: opacity },
+        uScale: { value: scale },
+        uRotation: { value: rotation },
+        uWarpStrength: { value: warpStrength },
+        uWarpCurvature: { value: warpCurvature },
+        uWarpFalloff: { value: warpFalloff },
+        uNoise: { value: noise },
+        uIntensity: { value: intensity },
         uColorA: { value: hexToRgb(colorA) },
         uColorB: { value: hexToRgb(colorB) },
+        uBackground: { value: hexToRgb(background) },
       },
     });
     const mesh = new Mesh(gl, { geometry, program });
@@ -194,7 +198,6 @@ export default function StarSwipe({
       renderer.gl.getExtension("WEBGL_lose_context")?.loseContext();
       if (mount.contains(canvas)) mount.removeChild(canvas);
     };
-    // Props are static per placement; the scene builds once.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

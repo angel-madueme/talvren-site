@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import GradientWaves from "./GradientWaves.jsx";
 import DotGrid from "./DotGrid.jsx";
+import UserCursor from "./UserCursor.jsx";
 import { prefersReducedMotion, useReveal, useScrollFill } from "./hooks.js";
 
 /*
@@ -520,6 +521,7 @@ function Footer() {
 export default function App() {
   return (
     <>
+      <UserCursor />
       <Nav />
       <main>
         <Hero />

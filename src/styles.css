@@ -1288,3 +1288,58 @@ ol {
     font-size: 11px;
   }
 }
+
+/* ---------- Custom user cursor (desktop, hover pointers only) ---------- */
+
+.cursor-hidden,
+.cursor-hidden * {
+  cursor: none !important;
+}
+
+.user-cursor__arrow,
+.user-cursor__tag {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+}
+
+.user-cursor__arrow svg {
+  display: block;
+  filter: drop-shadow(0 1px 3px rgba(33, 33, 33, 0.35));
+}
+
+.user-cursor__arrow svg path {
+  fill: var(--blue);
+  stroke: #ffffff;
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+
+/* Over the blue panel background: white cursor */
+.user-cursor__arrow.is-light svg path {
+  fill: #ffffff;
+  stroke: rgba(33, 33, 33, 0.28);
+}
+
+.user-cursor__tag {
+  padding: 3px 10px;
+  border-radius: 9999px;
+  background: var(--blue);
+  color: #ffffff;
+  font-family: var(--font-text);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+  white-space: nowrap;
+  box-shadow: 0 3px 12px rgba(33, 33, 33, 0.18);
+}
+
+.user-cursor__tag.is-light {
+  background: #ffffff;
+  color: var(--ink);
+}

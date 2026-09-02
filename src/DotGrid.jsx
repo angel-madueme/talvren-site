@@ -107,12 +107,11 @@ const DotGrid = ({
     // Moderate push so dots glide rather than snap.
     const PUSH_SCALE = 0.72;
 
-    // Two virtual pointers wander the grid, each on a blend of two low
-    // frequencies per axis — fluid, continuous, non-repeating motion (no fast
-    // jitter) so the effect stays lively but smooth.
+    // One virtual pointer wanders the grid on a blend of two low frequencies
+    // per axis — fluid, continuous, non-repeating motion (no fast jitter) so
+    // the effect stays lively but smooth.
     const paths = [
-      { fx: 0.5, gx: 0.31, fy: 0.42, gy: 0.27, ph: 0.0, prev: null },
-      { fx: 0.44, gx: 0.29, fy: 0.55, gy: 0.35, ph: 2.6, prev: null }
+      { fx: 0.5, gx: 0.31, fy: 0.42, gy: 0.27, ph: 0.0, prev: null }
     ];
 
     const applyInertia = (x, y, vx, vy, speed) => {

@@ -61,12 +61,12 @@ void main() {
   warp *= uWarpStrength;
   warp *= 1.0 / (1.0 + uWarpFalloff * 0.04 * dot(uv, uv)); // soften toward edges
 
-  // Overlapping soft bands.
+  // Overlapping bands — crisper edges so the ribbons read as distinct streaks.
   float v = 0.0;
-  v += sin(uv.x * 2.1 + warp * 3.0 + t) * 0.5 + 0.5;
-  v += sin(uv.x * 1.3 - uv.y * 0.55 + warp * 2.0 - t * 0.7) * 0.25 + 0.25;
-  v *= 0.6667;
-  v = smoothstep(0.22, 0.95, v);
+  v += sin(uv.x * 2.4 + warp * 3.2 + t) * 0.5 + 0.5;
+  v += sin(uv.x * 1.5 - uv.y * 0.6 + warp * 2.2 - t * 0.7) * 0.3 + 0.3;
+  v *= 0.625;
+  v = smoothstep(0.3, 0.86, v);
 
   // Blue <-> purple blend woven through the field.
   float cm = clamp(0.5 + 0.5 * sin(uv.y * 0.9 + warp + t * 0.4), 0.0, 1.0);

@@ -93,7 +93,13 @@ function Hero() {
     <section className="hero" id="top">
       {!reduce && (
         <div className="hero-waves" aria-hidden="true">
-          <StarSwipe colorA="#98C1FF" colorB="#BE9DFF" background="#F4F4F4" />
+          <StarSwipe
+            colorA="#7EACF2"
+            colorB="#AB84E6"
+            background="#F4F4F4"
+            intensity={0.58}
+            warpStrength={1.3}
+          />
         </div>
       )}
       <div className="hero-scrim" aria-hidden="true" />

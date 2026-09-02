@@ -343,13 +343,22 @@ ol {
   transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.nav-links a:hover,
-.nav-links a:focus-visible {
+@media (hover: hover) {
+  .nav-links a:hover {
+    opacity: 1;
+  }
+
+  .nav-links a:hover::after {
+    transform: scaleX(1);
+  }
+}
+
+/* Pressed state — underline wipes in while held */
+.nav-links a:active {
   opacity: 1;
 }
 
-.nav-links a:hover::after,
-.nav-links a:focus-visible::after {
+.nav-links a:active::after {
   transform: scaleX(1);
 }
 
@@ -440,7 +449,7 @@ ol {
     display: none;
   }
 
-  .nav-links a:hover {
+  .nav-links a:active {
     background: var(--canvas);
   }
 
@@ -511,6 +520,17 @@ ol {
     transform: translateX(4px);
     color: var(--btn-hover-text);
   }
+}
+
+/* Pressed state — the fill shows on :active (touch + mouse) and clears on
+   release, so it never latches. */
+.btn:active::before {
+  transform: translateY(0);
+}
+
+.btn:active .btn-label {
+  transform: translateX(4px);
+  color: var(--btn-hover-text);
 }
 
 .btn:active {
@@ -890,6 +910,12 @@ ol {
   font-size: 18px;
   line-height: 1.4;
   letter-spacing: -0.01em;
+  transition: background 0.15s ease;
+}
+
+/* Pressed state */
+.faq-summary:active {
+  background: rgba(33, 33, 33, 0.04);
 }
 
 .faq-marker {
@@ -1028,7 +1054,8 @@ ol {
   text-decoration: none;
 }
 
-.footer-link:hover {
+.footer-link:hover,
+.footer-link:active {
   text-decoration: underline;
 }
 
@@ -1182,7 +1209,8 @@ ol {
     transition: none;
   }
 
-  .btn:hover .btn-label {
+  .btn:hover .btn-label,
+  .btn:active .btn-label {
     transform: none;
   }
 

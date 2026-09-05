@@ -2,14 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import StarSwipe from "./StarSwipe.jsx";
 import DotGrid from "./DotGrid.jsx";
 import UserCursor from "./UserCursor.jsx";
+import IpmeLogo from "./IpmeLogo.jsx";
 import { prefersReducedMotion, useReveal, useScrollFill } from "./hooks.js";
 
 /*
  * Section copy is final (provided by client). The contact email
- * (hello@talvren.ie) is still a PLACEHOLDER — replace when confirmed.
+ * (hello@ipme.ie) is still a PLACEHOLDER — replace when confirmed.
  */
 
-const CONTACT_EMAIL = "hello@talvren.ie";
+const CONTACT_EMAIL = "hello@ipme.ie";
 
 function CornerDots({ light = false }) {
   return (
@@ -47,8 +48,9 @@ function Nav() {
   return (
     <header className="nav-wrap">
       <nav className="nav" aria-label="Main navigation" ref={navRef}>
-        <a href="#top" className="nav-brand" onClick={close}>
-          TALVREN
+        <a href="#top" className="nav-brand" onClick={close} aria-label="IPME — home">
+          <IpmeLogo className="nav-logo" />
+          <span className="nav-brand-name">IPME</span>
         </a>
         <button
           type="button"
@@ -491,12 +493,15 @@ function Footer() {
   return (
     <footer className="footer">
       <div className="container footer-inner reveal" ref={ref}>
-        <span className="display footer-brand">TALVREN</span>
+        <span className="display footer-brand">
+          <IpmeLogo className="footer-logo" />
+          IPME
+        </span>
         <div className="footer-meta">
           <a href={`mailto:${CONTACT_EMAIL}`} className="footer-link">
             {CONTACT_EMAIL}
           </a>
-          <span className="footer-copy">© 2026 TALVREN — Based in Ireland</span>
+          <span className="footer-copy">© 2026 IPME — Based in Ireland</span>
         </div>
       </div>
     </footer>

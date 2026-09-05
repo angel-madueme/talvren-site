@@ -1,5 +1,5 @@
 /* ============================================================
-   TALVREN — design system per design-brief.md
+   IPME — design system per design-brief.md
    ============================================================ */
 
 :root {
@@ -303,6 +303,9 @@ ol {
 }
 
 .nav-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
   font-family: var(--font-display);
   font-size: 18px;
   font-weight: 600;
@@ -310,6 +313,12 @@ ol {
   text-decoration: none;
   color: var(--ink);
   text-transform: uppercase;
+}
+
+.nav-logo {
+  height: 22px;
+  width: auto;
+  display: block;
 }
 
 .nav-links {
@@ -1031,11 +1040,20 @@ ol {
 }
 
 .footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
   color: var(--canvas);
   font-size: 24px;
   font-weight: 600;
   letter-spacing: 0.02em;
   text-transform: uppercase;
+}
+
+.footer-logo {
+  height: 26px;
+  width: auto;
+  display: block;
 }
 
 .footer-meta {

@@ -8,9 +8,7 @@
       (function () {
         try {
           var s = localStorage.getItem("theme");
-          var t = s === "light" || s === "dark"
-            ? s
-            : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+          var t = s === "light" || s === "dark" ? s : "dark";
           document.documentElement.setAttribute("data-theme", t);
         } catch (e) {}
       })();

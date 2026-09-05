@@ -9,10 +9,8 @@ function getInitialTheme() {
   } catch {
     /* ignore */
   }
-  if (typeof window !== "undefined" && window.matchMedia) {
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  }
-  return "light";
+  // Dark is the default for first-time visitors.
+  return "dark";
 }
 
 export function ThemeProvider({ children }) {

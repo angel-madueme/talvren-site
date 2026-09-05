@@ -3,6 +3,8 @@ import StarSwipe from "./StarSwipe.jsx";
 import DotGrid from "./DotGrid.jsx";
 import UserCursor from "./UserCursor.jsx";
 import IpmeLogo from "./IpmeLogo.jsx";
+import ThemeToggle from "./ThemeToggle.jsx";
+import { useTheme } from "./theme.jsx";
 import { prefersReducedMotion, useReveal, useScrollFill } from "./hooks.js";
 
 /*
@@ -91,15 +93,17 @@ function Nav() {
 /* 1. HERO — StarSwipe flowing warped bands (blue/purple on light), text above */
 function Hero() {
   const [reduce] = useState(() => prefersReducedMotion());
+  const { theme } = useTheme();
   return (
     <section className="hero" id="top">
       {!reduce && (
         <div className="hero-waves" aria-hidden="true">
           <StarSwipe
+            key={theme}
             colorA="#7EACF2"
             colorB="#AB84E6"
-            background="#F4F4F4"
-            intensity={0.58}
+            background={theme === "dark" ? "#0E0E14" : "#F4F4F4"}
+            intensity={theme === "dark" ? 0.72 : 0.58}
             warpStrength={1.3}
           />
         </div>
@@ -502,6 +506,7 @@ function Footer() {
             {CONTACT_EMAIL}
           </a>
           <span className="footer-copy">© 2026 IPME — Based in Ireland</span>
+          <ThemeToggle />
         </div>
       </div>
     </footer>

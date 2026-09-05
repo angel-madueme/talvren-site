@@ -3,6 +3,7 @@
    ============================================================ */
 
 :root {
+  color-scheme: light;
   --canvas: #f4f4f4;
   --ink: #212121;
   --card: #ffffff;
@@ -11,11 +12,35 @@
   --purple: #be9dff;
   --muted: #8a8a8a;
 
+  /* Semantic tokens that flip between themes */
+  --text-2: #555555;
+  --hairline: rgba(33, 33, 33, 0.12);
+  --card-shadow: 0 6px 34px rgba(33, 33, 33, 0.06);
+  --hero-bg: #f4f4f4;
+
+  /* Intentionally-dark surfaces (CTA panel, footer) — dark in both themes */
+  --surface-dark: #212121;
+  --on-dark: #f4f4f4;
+
   --font-display: "JetBrains Mono", ui-monospace, monospace;
   --font-text: "Instrument Sans", system-ui, -apple-system, sans-serif;
 
   --panel-radius: 28px;
   --card-radius: 18px;
+}
+
+/* ---------- Dark theme ---------- */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --canvas: #0e0e14;
+  --ink: #f1f2f5;
+  --card: #191922;
+  --muted: #9a9aa6;
+  --text-2: rgba(241, 242, 245, 0.62);
+  --hairline: rgba(244, 244, 244, 0.14);
+  --card-shadow: 0 8px 34px rgba(0, 0, 0, 0.55);
+  --hero-bg: #0e0e14;
+  --surface-dark: #1c1c26;
 }
 
 *,
@@ -127,8 +152,16 @@ ol {
   color: rgba(33, 33, 33, 0.8);
 }
 
+/* Accent panels stay light-coloured in both themes, so their headline must
+   stay dark (--ink would flip to light and wash out on the panel). */
+.panel-blue .section-title,
+.panel-orange .section-title,
+.panel-purple .section-title {
+  color: #1a1a22;
+}
+
 .section-plain .section-intro {
-  color: #555;
+  color: var(--text-2);
 }
 
 /* Who We Help — statement panel (shares the standard .section padding).
@@ -148,7 +181,7 @@ ol {
   width: fit-content;
   align-items: center;
   gap: 8px;
-  border: 1px solid rgba(33, 33, 33, 0.12);
+  border: 1px solid var(--hairline);
   border-radius: 9999px;
   padding: 6px 14px 6px 12px;
   font-family: var(--font-display);
@@ -217,8 +250,8 @@ ol {
 }
 
 .panel-white {
-  background: #ffffff;
-  box-shadow: 0 6px 34px rgba(33, 33, 33, 0.06);
+  background: var(--card);
+  box-shadow: var(--card-shadow);
 }
 
 .panel-blue {
@@ -234,7 +267,7 @@ ol {
 }
 
 .panel-dark {
-  background: var(--ink);
+  background: var(--surface-dark);
 }
 
 /* Larger 32px gap (scales down on mobile) before these top sections.
@@ -554,20 +587,27 @@ ol {
   --btn-hover-text: var(--ink);
 }
 
-/* Secondary CTA — gray, slides to black */
+/* Secondary CTA — gray, slides to the opposite tone (theme-aware) */
 .btn-secondary {
   --btn-bg: #e5e5e5;
-  --btn-text: var(--ink);
-  --btn-hover-bg: var(--ink);
-  --btn-hover-text: var(--canvas);
+  --btn-text: #1a1a22;
+  --btn-hover-bg: #1a1a22;
+  --btn-hover-text: #f4f4f4;
 }
 
-/* Primary CTA on a dark panel — light, slides to blue */
+:root[data-theme="dark"] .btn-secondary {
+  --btn-bg: #2a2a33;
+  --btn-text: #f1f2f5;
+  --btn-hover-bg: #f1f2f5;
+  --btn-hover-text: #1a1a22;
+}
+
+/* Light CTA on the always-dark panel — fixed light in both themes, slides to blue */
 .btn-light {
-  --btn-bg: var(--canvas);
-  --btn-text: var(--ink);
+  --btn-bg: #f4f4f4;
+  --btn-text: #1a1a22;
   --btn-hover-bg: var(--blue);
-  --btn-hover-text: var(--ink);
+  --btn-hover-text: #1a1a22;
 }
 
 .btn-lg {
@@ -650,7 +690,7 @@ ol {
 .card-copy {
   font-size: 16px;
   line-height: 1.6;
-  color: #555;
+  color: var(--text-2);
 }
 
 .card-points {
@@ -769,17 +809,17 @@ ol {
 }
 
 .why2-copy {
-  color: #555;
+  color: var(--text-2);
   max-width: 420px;
 }
 
 .why-item {
-  border-top: 1px solid rgba(33, 33, 33, 0.12);
+  border-top: 1px solid var(--hairline);
   padding: 26px 0;
 }
 
 .why-item:last-child {
-  border-bottom: 1px solid rgba(33, 33, 33, 0.12);
+  border-bottom: 1px solid var(--hairline);
 }
 
 .why-item-head {
@@ -811,7 +851,7 @@ ol {
 .why-item-copy {
   font-size: 16px;
   line-height: 1.6;
-  color: rgba(33, 33, 33, 0.65);
+  color: var(--text-2);
   max-width: 540px;
 }
 
@@ -850,7 +890,7 @@ ol {
 .reason-copy {
   font-size: 16px;
   line-height: 1.6;
-  color: rgba(33, 33, 33, 0.75);
+  color: var(--text-2);
 }
 
 .steps {
@@ -882,7 +922,7 @@ ol {
 }
 
 .step-copy {
-  color: #555;
+  color: var(--text-2);
 }
 
 /* ---------- FAQ ---------- */
@@ -979,7 +1019,7 @@ ol {
   padding: 0 24px 22px;
   font-size: 16px;
   line-height: 1.6;
-  color: #555;
+  color: var(--text-2);
   max-width: 640px;
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -1008,7 +1048,7 @@ ol {
 }
 
 .cta-title {
-  color: var(--canvas);
+  color: var(--on-dark);
 }
 
 .cta-tagline {
@@ -1025,7 +1065,7 @@ ol {
 }
 
 .footer {
-  background: var(--ink);
+  background: var(--surface-dark);
   margin: 0 clamp(8px, 1.2vw, 14px) clamp(10px, 1.5vw, 18px);
   border-radius: var(--panel-radius);
   padding: 44px 0;
@@ -1043,7 +1083,7 @@ ol {
   display: inline-flex;
   align-items: center;
   gap: 11px;
-  color: var(--canvas);
+  color: var(--on-dark);
   font-size: 24px;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -1064,7 +1104,7 @@ ol {
 }
 
 .footer-link {
-  color: var(--canvas);
+  color: var(--on-dark);
   font-size: 14px;
   font-weight: 500;
   text-decoration: none;
@@ -1090,7 +1130,10 @@ ol {
   --fill: 0;
   display: block;
   background-image: linear-gradient(var(--ink), var(--ink)),
-    linear-gradient(rgba(33, 33, 33, 0.22), rgba(33, 33, 33, 0.22));
+    linear-gradient(
+      color-mix(in srgb, var(--ink) 22%, transparent),
+      color-mix(in srgb, var(--ink) 22%, transparent)
+    );
   background-size: calc(var(--fill) * 100%) 100%, 100% 100%;
   background-repeat: no-repeat;
   -webkit-background-clip: text;
@@ -1358,4 +1401,84 @@ ol {
 .user-cursor__tag.is-light {
   background: #ffffff;
   color: var(--ink);
+}
+
+/* ---------- Dark-theme surface adjustments ---------- */
+
+/* Dark vignette behind the hero text (light scrim would wash the dark hero) */
+:root[data-theme="dark"] .hero-scrim {
+  background: radial-gradient(
+    110% 72% at 50% 44%,
+    rgba(8, 8, 14, 0.78) 0%,
+    rgba(8, 8, 14, 0.4) 44%,
+    rgba(8, 8, 14, 0) 76%
+  );
+}
+
+/* Cards/panels get a hairline in dark, since drop shadows disappear on dark */
+:root[data-theme="dark"] .card,
+:root[data-theme="dark"] .step-card,
+:root[data-theme="dark"] .faq-item,
+:root[data-theme="dark"] .panel-white {
+  border: 1px solid var(--hairline);
+}
+
+/* ---------- Theme toggle (footer) ---------- */
+.theme-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 62px;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid rgba(244, 244, 244, 0.22);
+  border-radius: 9999px;
+  background: rgba(244, 244, 244, 0.08);
+  cursor: pointer;
+  color: var(--on-dark);
+}
+
+.theme-toggle:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+}
+
+.theme-toggle__icon {
+  position: relative;
+  z-index: 1;
+  width: 15px;
+  height: 15px;
+  display: block;
+  color: rgba(244, 244, 244, 0.5);
+  transition: color 0.25s ease;
+}
+
+/* the active side's icon brightens */
+:root:not([data-theme="dark"]) .theme-toggle__icon--sun,
+:root[data-theme="dark"] .theme-toggle__icon--moon {
+  color: var(--on-dark);
+}
+
+.theme-toggle__knob {
+  position: absolute;
+  z-index: 0;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(244, 244, 244, 0.16);
+  transition: transform 0.28s cubic-bezier(0.33, 1, 0.35, 1);
+}
+
+:root[data-theme="dark"] .theme-toggle__knob {
+  transform: translateX(32px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle__knob {
+    transition: none;
+  }
 }
